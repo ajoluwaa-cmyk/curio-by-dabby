@@ -1,32 +1,63 @@
+"use client";
+
 import Link from "next/link";
+import { motion } from "framer-motion";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0 },
+};
 
 export default function HomePage() {
   return (
     <main className="pt-16">
       {/* ========== HERO ========== */}
-      <section className="relative flex min-h-[90vh] items-center justify-center overflow-hidden px-6">
-        {/* Soft background depth */}
-        <div className="absolute inset-0 bg-gradient-to-b from-plum/[0.03] via-ivory to-champagne/[0.08]" />
-        <div className="absolute -top-40 right-0 h-[500px] w-[500px] rounded-full bg-champagne/20 blur-3xl" />
-        <div className="absolute -bottom-40 left-0 h-[400px] w-[400px] rounded-full bg-plum/10 blur-3xl" />
+      <section className="relative flex min-h-[92vh] items-center justify-center overflow-hidden px-6">
+        <div className="absolute inset-0 bg-gradient-to-b from-plum/[0.04] via-ivory to-champagne/[0.09]" />
+        <div className="absolute -top-40 right-0 h-[520px] w-[520px] rounded-full bg-champagne/25 blur-3xl" />
+        <div className="absolute -bottom-48 left-0 h-[420px] w-[420px] rounded-full bg-plum/10 blur-3xl" />
 
         <div className="relative z-10 mx-auto max-w-4xl text-center">
-          <p className="mb-6 text-xs font-medium tracking-[0.25em] text-taupe uppercase">
+          <motion.p
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            transition={{ duration: 0.6 }}
+            className="mb-6 text-xs font-medium tracking-[0.25em] text-taupe uppercase"
+          >
             Curio By Dabby
-          </p>
+          </motion.p>
 
-          <h1 className="mb-6 text-5xl font-light leading-[1.1] tracking-tight text-charcoal sm:text-6xl md:text-7xl">
+          <motion.h1
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            transition={{ duration: 0.7, delay: 0.1 }}
+            className="mb-6 text-5xl font-light leading-[1.1] tracking-tight text-charcoal sm:text-6xl md:text-7xl"
+          >
             More Than Gifts.
             <br />
             <span className="text-plum">More Than Shopping.</span>
-          </h1>
+          </motion.h1>
 
-          <p className="mx-auto mb-12 max-w-xl text-lg leading-relaxed text-taupe">
+          <motion.p
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="mx-auto mb-12 max-w-xl text-lg leading-relaxed text-taupe"
+          >
             Discover distinctive lifestyle pieces and thoughtful gifts — 
             guided by an intelligent assistant that understands intention.
-          </p>
+          </motion.p>
 
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="flex flex-col items-center justify-center gap-4 sm:flex-row"
+          >
             <Link
               href="/shop"
               className="rounded-full bg-plum px-10 py-4 text-sm font-medium text-ivory transition hover:bg-plum/90 hover:shadow-elegant"
@@ -39,7 +70,7 @@ export default function HomePage() {
             >
               Find a Gift
             </Link>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -65,7 +96,7 @@ export default function HomePage() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="group flex aspect-[4/5] flex-col items-center justify-center rounded-2xl border border-taupe/20 bg-white/50 transition hover:border-plum/30 hover:bg-white hover:shadow-soft"
+                className="group flex aspect-[4/5] flex-col items-center justify-center rounded-2xl border border-taupe/20 bg-white/50 transition duration-300 hover:border-plum/30 hover:bg-white hover:shadow-soft"
               >
                 <span className="text-sm font-medium text-charcoal transition group-hover:text-plum">
                   {item.name}
@@ -76,7 +107,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ========== AI ASSISTANT TEASER ========== */}
+      {/* ========== AI ASSISTANT ========== */}
       <section className="bg-plum px-6 py-24 text-ivory">
         <div className="mx-auto max-w-4xl text-center">
           <p className="mb-4 text-xs tracking-[0.2em] text-champagne uppercase">
@@ -114,12 +145,12 @@ export default function HomePage() {
             {["Signature Collection", "Artwear", "Colour Stories"].map((title) => (
               <div
                 key={title}
-                className="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-gradient-to-br from-champagne/30 to-plum/10"
+                className="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-gradient-to-br from-champagne/40 to-plum/15 transition duration-500 hover:shadow-elegant"
               >
                 <div className="absolute inset-0 flex items-end p-6">
                   <div>
                     <h3 className="text-lg font-medium text-charcoal">{title}</h3>
-                    <p className="mt-1 text-sm text-taupe">Coming soon</p>
+                    <p className="mt-1 text-sm text-taupe">Explore collection</p>
                   </div>
                 </div>
               </div>
@@ -129,7 +160,7 @@ export default function HomePage() {
       </section>
 
       {/* ========== BUILD YOUR GIFT BOX ========== */}
-      <section className="border-y border-taupe/15 bg-white/40 px-6 py-24">
+      <section className="border-y border-taupe/15 bg-white/50 px-6 py-24">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="mb-4 text-3xl font-light text-charcoal md:text-4xl">
             Build Your Own Gift Box
@@ -159,7 +190,7 @@ export default function HomePage() {
             <input
               type="email"
               placeholder="Your email address"
-              className="flex-1 rounded-full border border-taupe/30 bg-white px-6 py-3.5 text-sm outline-none focus:border-plum"
+              className="flex-1 rounded-full border border-taupe/30 bg-white px-6 py-3.5 text-sm outline-none transition focus:border-plum"
             />
             <button
               type="submit"
