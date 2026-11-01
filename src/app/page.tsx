@@ -4,26 +4,27 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0 },
 };
 
 export default function HomePage() {
   return (
     <main className="pt-16">
-      {/* ========== HERO ========== */}
-      <section className="relative flex min-h-[92vh] items-center justify-center overflow-hidden px-6">
-        <div className="absolute inset-0 bg-gradient-to-b from-plum/[0.04] via-ivory to-champagne/[0.09]" />
-        <div className="absolute -top-40 right-0 h-[520px] w-[520px] rounded-full bg-champagne/25 blur-3xl" />
-        <div className="absolute -bottom-48 left-0 h-[420px] w-[420px] rounded-full bg-plum/10 blur-3xl" />
+      {/* ================= HERO ================= */}
+      <section className="relative flex min-h-[90vh] items-center justify-center overflow-hidden px-6">
+        {/* Background depth */}
+        <div className="absolute inset-0 bg-gradient-to-b from-plum/[0.03] via-ivory to-champagne/[0.07]" />
+        <div className="absolute -top-32 right-0 h-[480px] w-[480px] rounded-full bg-champagne/20 blur-3xl" />
+        <div className="absolute -bottom-40 left-0 h-[380px] w-[380px] rounded-full bg-plum/8 blur-3xl" />
 
-        <div className="relative z-10 mx-auto max-w-4xl text-center">
+        <div className="relative z-10 mx-auto max-w-3xl text-center">
           <motion.p
             initial="hidden"
             animate="visible"
             variants={fadeUp}
             transition={{ duration: 0.6 }}
-            className="mb-6 text-xs font-medium tracking-[0.25em] text-taupe uppercase"
+            className="mb-5 text-[11px] font-medium tracking-[0.28em] text-taupe uppercase"
           >
             Curio By Dabby
           </motion.p>
@@ -32,8 +33,8 @@ export default function HomePage() {
             initial="hidden"
             animate="visible"
             variants={fadeUp}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className="mb-6 text-5xl font-light leading-[1.1] tracking-tight text-charcoal sm:text-6xl md:text-7xl"
+            transition={{ duration: 0.7, delay: 0.08 }}
+            className="mb-6 text-[2.75rem] font-light leading-[1.12] tracking-tight text-charcoal sm:text-5xl md:text-6xl lg:text-[4.2rem]"
           >
             More Than Gifts.
             <br />
@@ -44,29 +45,28 @@ export default function HomePage() {
             initial="hidden"
             animate="visible"
             variants={fadeUp}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="mx-auto mb-12 max-w-xl text-lg leading-relaxed text-taupe"
+            transition={{ duration: 0.7, delay: 0.16 }}
+            className="mx-auto mb-11 max-w-lg text-base leading-relaxed text-taupe sm:text-lg"
           >
-            Discover distinctive lifestyle pieces and thoughtful gifts — 
-            guided by an intelligent assistant that understands intention.
+            Discover distinctive lifestyle pieces and thoughtful gifts — guided by an intelligent assistant that understands intention.
           </motion.p>
 
           <motion.div
             initial="hidden"
             animate="visible"
             variants={fadeUp}
-            transition={{ duration: 0.7, delay: 0.3 }}
-            className="flex flex-col items-center justify-center gap-4 sm:flex-row"
+            transition={{ duration: 0.7, delay: 0.24 }}
+            className="flex flex-col items-center justify-center gap-3.5 sm:flex-row"
           >
             <Link
               href="/shop"
-              className="rounded-full bg-plum px-10 py-4 text-sm font-medium text-ivory transition hover:bg-plum/90 hover:shadow-elegant"
+              className="rounded-full bg-plum px-9 py-3.5 text-sm font-medium text-ivory transition hover:bg-plum/90 hover:shadow-elegant"
             >
               Shop Now
             </Link>
             <Link
               href="/gifts"
-              className="rounded-full border border-plum/25 bg-white/60 px-10 py-4 text-sm font-medium text-plum backdrop-blur transition hover:border-plum hover:bg-white"
+              className="rounded-full border border-plum/20 bg-white/70 px-9 py-3.5 text-sm font-medium text-plum backdrop-blur transition hover:border-plum/50 hover:bg-white"
             >
               Find a Gift
             </Link>
@@ -74,17 +74,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ========== CATEGORY EXPLORER ========== */}
-      <section className="px-6 py-24">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-14 text-center">
-            <h2 className="mb-3 text-3xl font-light text-charcoal md:text-4xl">
-              Explore the World of Curio
+      {/* ================= CATEGORIES ================= */}
+      <section className="px-6 py-20 md:py-28">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-12 text-center md:mb-16">
+            <h2 className="mb-3 text-2xl font-light tracking-tight text-charcoal md:text-3xl">
+              Explore Curio
             </h2>
-            <p className="text-taupe">Carefully curated categories for every intention</p>
+            <p className="text-sm text-taupe">Carefully curated for every intention</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-6">
             {[
               { name: "Beauty", href: "/shop/beauty" },
               { name: "Fashion", href: "/shop/fashion" },
@@ -96,7 +96,7 @@ export default function HomePage() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="group flex aspect-[4/5] flex-col items-center justify-center rounded-2xl border border-taupe/20 bg-white/50 transition duration-300 hover:border-plum/30 hover:bg-white hover:shadow-soft"
+                className="group flex aspect-[3/4] flex-col items-center justify-center rounded-2xl border border-taupe/15 bg-white/60 transition duration-300 hover:border-plum/25 hover:bg-white hover:shadow-soft"
               >
                 <span className="text-sm font-medium text-charcoal transition group-hover:text-plum">
                   {item.name}
@@ -107,51 +107,55 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ========== AI ASSISTANT ========== */}
-      <section className="bg-plum px-6 py-24 text-ivory">
-        <div className="mx-auto max-w-4xl text-center">
-          <p className="mb-4 text-xs tracking-[0.2em] text-champagne uppercase">
+      {/* ================= AI ASSISTANT ================= */}
+      <section className="bg-plum px-6 py-20 md:py-28">
+        <div className="mx-auto max-w-2xl text-center text-ivory">
+          <p className="mb-4 text-[11px] tracking-[0.22em] text-champagne uppercase">
             Intelligent Shopping
           </p>
-          <h2 className="mb-6 text-3xl font-light md:text-5xl">
-            Meet Your Personal Shopping Assistant
+          <h2 className="mb-5 text-2xl font-light leading-snug md:text-4xl">
+            Meet Your Personal<br className="hidden sm:block" /> Shopping Assistant
           </h2>
-          <p className="mx-auto mb-10 max-w-2xl text-lg text-champagne/90">
-            Tell Curio who you’re buying for, the occasion, their style and budget. 
-            Receive thoughtful, real-product recommendations in seconds.
+          <p className="mx-auto mb-9 max-w-md text-sm leading-relaxed text-champagne/85 md:text-base">
+            Tell Curio who you’re buying for, the occasion, their style and budget. Receive thoughtful recommendations from real products in our collection.
           </p>
-          <button className="rounded-full bg-champagne px-10 py-4 text-sm font-medium text-plum transition hover:bg-white">
+          <button className="rounded-full bg-champagne px-8 py-3.5 text-sm font-medium text-plum transition hover:bg-white">
             Ask Curio
           </button>
         </div>
       </section>
 
-      {/* ========== CURIO EXCLUSIVES ========== */}
-      <section className="px-6 py-24">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-14 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
+      {/* ================= CURIO EXCLUSIVES ================= */}
+      <section className="px-6 py-20 md:py-28">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-12 flex flex-col items-start justify-between gap-4 md:mb-16 md:flex-row md:items-end">
             <div>
-              <h2 className="mb-2 text-3xl font-light text-charcoal md:text-4xl">
+              <h2 className="mb-2 text-2xl font-light tracking-tight text-charcoal md:text-3xl">
                 Curio Exclusives
               </h2>
-              <p className="text-taupe">Original collections designed with intention</p>
+              <p className="text-sm text-taupe">Original collections designed with intention</p>
             </div>
-            <Link href="/collections" className="text-sm font-medium text-plum underline-offset-4 hover:underline">
+            <Link
+              href="/collections"
+              className="text-sm font-medium text-plum underline-offset-4 transition hover:underline"
+            >
               View all collections →
             </Link>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3">
-            {["Signature Collection", "Artwear", "Colour Stories"].map((title) => (
+          <div className="grid gap-5 md:grid-cols-3">
+            {[
+              { title: "Signature Collection", subtitle: "Subtle logo + distinctive artwork" },
+              { title: "Artwear", subtitle: "Contemporary African illustration" },
+              { title: "Colour Stories", subtitle: "Coordinated drops & limited editions" },
+            ].map((item) => (
               <div
-                key={title}
-                className="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-gradient-to-br from-champagne/40 to-plum/15 transition duration-500 hover:shadow-elegant"
+                key={item.title}
+                className="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-gradient-to-br from-champagne/35 via-ivory to-plum/10 transition duration-500 hover:shadow-elegant"
               >
-                <div className="absolute inset-0 flex items-end p-6">
-                  <div>
-                    <h3 className="text-lg font-medium text-charcoal">{title}</h3>
-                    <p className="mt-1 text-sm text-taupe">Explore collection</p>
-                  </div>
+                <div className="absolute inset-0 flex flex-col justify-end p-6">
+                  <h3 className="text-base font-medium text-charcoal">{item.title}</h3>
+                  <p className="mt-1 text-xs text-taupe">{item.subtitle}</p>
                 </div>
               </div>
             ))}
@@ -159,42 +163,42 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ========== BUILD YOUR GIFT BOX ========== */}
-      <section className="border-y border-taupe/15 bg-white/50 px-6 py-24">
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="mb-4 text-3xl font-light text-charcoal md:text-4xl">
+      {/* ================= BUILD A GIFT ================= */}
+      <section className="border-y border-taupe/10 bg-white/40 px-6 py-20 md:py-24">
+        <div className="mx-auto max-w-xl text-center">
+          <h2 className="mb-3 text-2xl font-light tracking-tight text-charcoal md:text-3xl">
             Build Your Own Gift Box
           </h2>
-          <p className="mb-10 text-taupe">
+          <p className="mb-8 text-sm leading-relaxed text-taupe">
             Select pieces you love, add a personal note, and create a gift that feels intentional.
           </p>
           <Link
             href="/gifts/build"
-            className="inline-block rounded-full border border-plum px-10 py-4 text-sm font-medium text-plum transition hover:bg-plum hover:text-ivory"
+            className="inline-block rounded-full border border-plum/80 px-8 py-3.5 text-sm font-medium text-plum transition hover:bg-plum hover:text-ivory"
           >
             Start Building
           </Link>
         </div>
       </section>
 
-      {/* ========== NEWSLETTER ========== */}
-      <section className="px-6 py-24">
-        <div className="mx-auto max-w-xl text-center">
-          <h2 className="mb-3 text-2xl font-light text-charcoal">
+      {/* ================= NEWSLETTER ================= */}
+      <section className="px-6 py-20 md:py-24">
+        <div className="mx-auto max-w-md text-center">
+          <h2 className="mb-3 text-xl font-light text-charcoal md:text-2xl">
             Stay Close to Curio
           </h2>
-          <p className="mb-8 text-taupe">
-            New drops, exclusive offers and thoughtful inspiration — delivered with care.
+          <p className="mb-7 text-sm text-taupe">
+            New drops, exclusive offers and thoughtful inspiration.
           </p>
           <form className="flex flex-col gap-3 sm:flex-row">
             <input
               type="email"
               placeholder="Your email address"
-              className="flex-1 rounded-full border border-taupe/30 bg-white px-6 py-3.5 text-sm outline-none transition focus:border-plum"
+              className="flex-1 rounded-full border border-taupe/25 bg-white px-5 py-3 text-sm outline-none transition focus:border-plum"
             />
             <button
               type="submit"
-              className="rounded-full bg-plum px-8 py-3.5 text-sm font-medium text-ivory transition hover:bg-plum/90"
+              className="rounded-full bg-plum px-7 py-3 text-sm font-medium text-ivory transition hover:bg-plum/90"
             >
               Subscribe
             </button>
@@ -202,17 +206,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ========== FOOTER ========== */}
-      <footer className="border-t border-taupe/20 px-6 py-12">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 md:flex-row">
+      {/* ================= FOOTER ================= */}
+      <footer className="border-t border-taupe/15 px-6 py-10">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-5 md:flex-row">
           <div className="text-center md:text-left">
             <p className="text-sm font-medium text-plum">Curio By Dabby</p>
-            <p className="mt-1 text-xs text-taupe">More Than Gifts. More Than Shopping.</p>
+            <p className="mt-0.5 text-xs text-taupe">More Than Gifts. More Than Shopping.</p>
           </div>
-          <div className="flex gap-8 text-sm text-taupe">
-            <Link href="/about" className="hover:text-plum">About</Link>
-            <Link href="/contact" className="hover:text-plum">Contact</Link>
-            <Link href="/shipping" className="hover:text-plum">Shipping</Link>
+          <div className="flex gap-7 text-sm text-taupe">
+            <Link href="/about" className="transition hover:text-plum">About</Link>
+            <Link href="/contact" className="transition hover:text-plum">Contact</Link>
+            <Link href="/shipping" className="transition hover:text-plum">Shipping</Link>
           </div>
         </div>
       </footer>
