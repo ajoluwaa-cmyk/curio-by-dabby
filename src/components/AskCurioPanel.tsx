@@ -16,7 +16,7 @@ export default function AskCurioPanel({ isOpen, onClose }: AskCurioPanelProps) {
   const [step, setStep] = useState<Step>("choice");
   const [recipient, setRecipient] = useState("");
   const [occasion, setOccasion] = useState("");
-  const [budget, setBudget] = useState("15000");
+  const [budget, setBudget] = useState("under-15");
   const [results, setResults] = useState<Product[]>([]);
 
   const resetAndClose = () => {
@@ -25,17 +25,33 @@ export default function AskCurioPanel({ isOpen, onClose }: AskCurioPanelProps) {
       setStep("choice");
       setRecipient("");
       setOccasion("");
-      setBudget("15000");
+      setBudget("under-15");
       setResults([]);
     }, 300);
   };
 
+  const getBudgetMax = (value: string): number => {
+    switch (value) {
+      case "under-15":
+        return 15000;
+      case "15-35":
+        return 35000;
+      case "35-70":
+        return 70000;
+      case "70-plus":
+        return 999999;
+      default:
+        return 70000;
+    }
+  };
+
   const handleGetRecommendations = () => {
-    const budgetMax = Number(budget) || 70000;
+    const budgetMax = getBudgetMax(budget);
     const matched = filterProductsForGift({
       budgetMax,
-      occasion: occasion || undefined,
+      occasion: occasion.trim() || undefined,
     }).slice(0, 6);
+
     setResults(matched);
     setStep("results");
   };
@@ -44,12 +60,15 @@ export default function AskCurioPanel({ isOpen, onClose }: AskCurioPanelProps) {
 
   return (
     <>
+      {/* Backdrop */}
       <div
         className="fixed inset-0 z-[60] bg-charcoal/40 backdrop-blur-sm"
         onClick={resetAndClose}
       />
 
+      {/* Panel */}
       <div className="fixed top-0 right-0 z-[70] flex h-full w-full max-w-md flex-col bg-ivory shadow-2xl">
+        {/* Header */}
         <div className="flex items-center justify-between border-b border-taupe/15 px-6 py-5">
           <div>
             <h3 className="text-lg font-medium text-plum">Ask Curio</h3>
@@ -60,7 +79,12 @@ export default function AskCurioPanel({ isOpen, onClose }: AskCurioPanelProps) {
             className="rounded-full p-2 text-charcoal transition hover:bg-taupe/10"
             aria-label="Close"
           >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -71,7 +95,9 @@ export default function AskCurioPanel({ isOpen, onClose }: AskCurioPanelProps) {
           </button>
         </div>
 
+        {/* Content */}
         <div className="flex-1 overflow-y-auto px-6 py-8">
+          {/* ===== CHOICE ===== */}
           {step === "choice" && (
             <div>
               <p className="mb-8 text-sm leading-relaxed text-taupe">
@@ -104,6 +130,7 @@ export default function AskCurioPanel({ isOpen, onClose }: AskCurioPanelProps) {
             </div>
           )}
 
+          {/* ===== GIFT FORM ===== */}
           {step === "gift" && (
             <div>
               <button
@@ -112,10 +139,12 @@ export default function AskCurioPanel({ isOpen, onClose }: AskCurioPanelProps) {
               >
                 ← Back
               </button>
-              <h4 className="mb-1 text-base font-medium text-charcoal">Find a Gift</h4>
+              <h4 className="mb-1 text-base font-medium text-charcoal">
+                Find a Gift
+              </h4>
               <p className="mb-8 text-sm text-taupe">
-                Tell me a few details and I’ll recommend thoughtful pieces from our
-                collection.
+                Tell me a few details and I’ll recommend thoughtful pieces from
+                our collection.
               </p>
               <div className="space-y-5">
                 <div>
@@ -151,10 +180,10 @@ export default function AskCurioPanel({ isOpen, onClose }: AskCurioPanelProps) {
                     onChange={(e) => setBudget(e.target.value)}
                     className="w-full rounded-xl border border-taupe/25 bg-white px-4 py-3 text-sm outline-none transition focus:border-plum"
                   >
-                    <option value="15000">Under ₦15,000</option>
-                    <option value="35000">₦15,000 – ₦35,000</option>
-                    <option value="70000">₦35,000 – ₦70,000</option>
-                    <option value="150000">₦70,000+</option>
+                    <option value="under-15">Under ₦15,000</option>
+                    <option value="15-35">₦15,000 – ₦35,000</option>
+                    <option value="35-70">₦35,000 – ₦70,000</option>
+                    <option value="70-plus">₦70,000+</option>
                   </select>
                 </div>
                 <button
@@ -167,6 +196,7 @@ export default function AskCurioPanel({ isOpen, onClose }: AskCurioPanelProps) {
             </div>
           )}
 
+          {/* ===== HELP ME SHOP ===== */}
           {step === "shop" && (
             <div>
               <button
@@ -175,8 +205,12 @@ export default function AskCurioPanel({ isOpen, onClose }: AskCurioPanelProps) {
               >
                 ← Back
               </button>
-              <h4 className="mb-1 text-base font-medium text-charcoal">Help Me Shop</h4>
-              <p className="mb-8 text-sm text-taupe">What are you looking for today?</p>
+              <h4 className="mb-1 text-base font-medium text-charcoal">
+                Help Me Shop
+              </h4>
+              <p className="mb-8 text-sm text-taupe">
+                What are you looking for today?
+              </p>
               <div className="space-y-3">
                 {[
                   { label: "Complete Outfit", href: "/shop" },
@@ -197,6 +231,7 @@ export default function AskCurioPanel({ isOpen, onClose }: AskCurioPanelProps) {
             </div>
           )}
 
+          {/* ===== RESULTS ===== */}
           {step === "results" && (
             <div>
               <button
@@ -210,15 +245,26 @@ export default function AskCurioPanel({ isOpen, onClose }: AskCurioPanelProps) {
               </h4>
               <p className="mb-6 text-sm text-taupe">
                 {recipient
-                  ? `Thoughtful picks${occasion ? ` for a ${occasion}` : ""} — ${recipient}.`
+                  ? `Thoughtful picks${
+                      occasion ? ` for a ${occasion}` : ""
+                    } — ${recipient}.`
                   : "Pieces that fit your brief, prioritising Curio originals."}
               </p>
 
               {results.length === 0 ? (
-                <p className="text-sm text-taupe">
-                  No exact matches in that budget. Try widening the range or browse the
-                  full shop.
-                </p>
+                <div className="rounded-2xl border border-taupe/15 bg-white p-6 text-center">
+                  <p className="text-sm text-taupe">
+                    No exact matches in that budget. Try widening the range or
+                    browse the full shop.
+                  </p>
+                  <Link
+                    href="/shop"
+                    onClick={resetAndClose}
+                    className="mt-4 inline-block text-sm font-medium text-plum underline-offset-4 hover:underline"
+                  >
+                    Browse all products →
+                  </Link>
+                </div>
               ) : (
                 <div className="space-y-4">
                   {results.map((product) => (
