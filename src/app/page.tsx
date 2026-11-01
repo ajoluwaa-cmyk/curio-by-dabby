@@ -13,18 +13,34 @@ export default function HomePage() {
     <main className="pt-16">
       {/* ================= HERO ================= */}
       <section className="relative flex min-h-[90vh] items-center justify-center overflow-hidden px-6">
-        {/* Background depth */}
-        <div className="absolute inset-0 bg-gradient-to-b from-plum/[0.03] via-ivory to-champagne/[0.07]" />
-        <div className="absolute -top-32 right-0 h-[480px] w-[480px] rounded-full bg-champagne/20 blur-3xl" />
-        <div className="absolute -bottom-40 left-0 h-[380px] w-[380px] rounded-full bg-plum/8 blur-3xl" />
+        {/* Video Background */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 h-full w-full object-cover"
+        >
+          <source
+            src="/curiobydabby%20homepage%20video.mp4"
+            type="video/mp4"
+          />
+        </video>
 
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-charcoal/50" />
+
+        {/* Soft brand gradient on top */}
+        <div className="absolute inset-0 bg-gradient-to-b from-plum/25 via-transparent to-charcoal/40" />
+
+        {/* Content */}
         <div className="relative z-10 mx-auto max-w-3xl text-center">
           <motion.p
             initial="hidden"
             animate="visible"
             variants={fadeUp}
             transition={{ duration: 0.6 }}
-            className="mb-5 text-[11px] font-medium tracking-[0.28em] text-taupe uppercase"
+            className="mb-5 text-[11px] font-medium tracking-[0.28em] text-champagne uppercase"
           >
             Curio By Dabby
           </motion.p>
@@ -34,11 +50,11 @@ export default function HomePage() {
             animate="visible"
             variants={fadeUp}
             transition={{ duration: 0.7, delay: 0.08 }}
-            className="mb-6 text-[2.75rem] font-light leading-[1.12] tracking-tight text-charcoal sm:text-5xl md:text-6xl lg:text-[4.2rem]"
+            className="mb-6 text-[2.75rem] font-light leading-[1.12] tracking-tight text-ivory sm:text-5xl md:text-6xl lg:text-[4.2rem]"
           >
             More Than Gifts.
             <br />
-            <span className="text-plum">More Than Shopping.</span>
+            <span className="text-champagne">More Than Shopping.</span>
           </motion.h1>
 
           <motion.p
@@ -46,9 +62,10 @@ export default function HomePage() {
             animate="visible"
             variants={fadeUp}
             transition={{ duration: 0.7, delay: 0.16 }}
-            className="mx-auto mb-11 max-w-lg text-base leading-relaxed text-taupe sm:text-lg"
+            className="mx-auto mb-11 max-w-lg text-base leading-relaxed text-ivory/85 sm:text-lg"
           >
-            Discover distinctive lifestyle pieces and thoughtful gifts — guided by an intelligent assistant that understands intention.
+            Discover distinctive lifestyle pieces and thoughtful gifts — guided
+            by an intelligent assistant that understands intention.
           </motion.p>
 
           <motion.div
@@ -66,7 +83,7 @@ export default function HomePage() {
             </Link>
             <Link
               href="/gifts"
-              className="rounded-full border border-plum/20 bg-white/70 px-9 py-3.5 text-sm font-medium text-plum backdrop-blur transition hover:border-plum/50 hover:bg-white"
+              className="rounded-full border border-ivory/40 bg-white/10 px-9 py-3.5 text-sm font-medium text-ivory backdrop-blur transition hover:border-ivory hover:bg-white/20"
             >
               Find a Gift
             </Link>
@@ -81,9 +98,10 @@ export default function HomePage() {
             <h2 className="mb-3 text-2xl font-light tracking-tight text-charcoal md:text-3xl">
               Explore Curio
             </h2>
-            <p className="text-sm text-taupe">Carefully curated for every intention</p>
+            <p className="text-sm text-taupe">
+              Carefully curated for every intention
+            </p>
           </div>
-
           <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-6">
             {[
               { name: "Beauty", href: "/shop/beauty" },
@@ -114,10 +132,13 @@ export default function HomePage() {
             Intelligent Shopping
           </p>
           <h2 className="mb-5 text-2xl font-light leading-snug md:text-4xl">
-            Meet Your Personal<br className="hidden sm:block" /> Shopping Assistant
+            Meet Your Personal
+            <br className="hidden sm:block" /> Shopping Assistant
           </h2>
           <p className="mx-auto mb-9 max-w-md text-sm leading-relaxed text-champagne/85 md:text-base">
-            Tell Curio who you’re buying for, the occasion, their style and budget. Receive thoughtful recommendations from real products in our collection.
+            Tell Curio who you’re buying for, the occasion, their style and
+            budget. Receive thoughtful recommendations from real products in our
+            collection.
           </p>
           <button className="rounded-full bg-champagne px-8 py-3.5 text-sm font-medium text-plum transition hover:bg-white">
             Ask Curio
@@ -133,7 +154,9 @@ export default function HomePage() {
               <h2 className="mb-2 text-2xl font-light tracking-tight text-charcoal md:text-3xl">
                 Curio Exclusives
               </h2>
-              <p className="text-sm text-taupe">Original collections designed with intention</p>
+              <p className="text-sm text-taupe">
+                Original collections designed with intention
+              </p>
             </div>
             <Link
               href="/collections"
@@ -142,19 +165,29 @@ export default function HomePage() {
               View all collections →
             </Link>
           </div>
-
           <div className="grid gap-5 md:grid-cols-3">
             {[
-              { title: "Signature Collection", subtitle: "Subtle logo + distinctive artwork" },
-              { title: "Artwear", subtitle: "Contemporary African illustration" },
-              { title: "Colour Stories", subtitle: "Coordinated drops & limited editions" },
+              {
+                title: "Signature Collection",
+                subtitle: "Subtle logo + distinctive artwork",
+              },
+              {
+                title: "Artwear",
+                subtitle: "Contemporary African illustration",
+              },
+              {
+                title: "Colour Stories",
+                subtitle: "Coordinated drops & limited editions",
+              },
             ].map((item) => (
               <div
                 key={item.title}
                 className="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-gradient-to-br from-champagne/35 via-ivory to-plum/10 transition duration-500 hover:shadow-elegant"
               >
                 <div className="absolute inset-0 flex flex-col justify-end p-6">
-                  <h3 className="text-base font-medium text-charcoal">{item.title}</h3>
+                  <h3 className="text-base font-medium text-charcoal">
+                    {item.title}
+                  </h3>
                   <p className="mt-1 text-xs text-taupe">{item.subtitle}</p>
                 </div>
               </div>
@@ -170,7 +203,8 @@ export default function HomePage() {
             Build Your Own Gift Box
           </h2>
           <p className="mb-8 text-sm leading-relaxed text-taupe">
-            Select pieces you love, add a personal note, and create a gift that feels intentional.
+            Select pieces you love, add a personal note, and create a gift that
+            feels intentional.
           </p>
           <Link
             href="/gifts/build"
@@ -211,12 +245,20 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-5 md:flex-row">
           <div className="text-center md:text-left">
             <p className="text-sm font-medium text-plum">Curio By Dabby</p>
-            <p className="mt-0.5 text-xs text-taupe">More Than Gifts. More Than Shopping.</p>
+            <p className="mt-0.5 text-xs text-taupe">
+              More Than Gifts. More Than Shopping.
+            </p>
           </div>
           <div className="flex gap-7 text-sm text-taupe">
-            <Link href="/about" className="transition hover:text-plum">About</Link>
-            <Link href="/contact" className="transition hover:text-plum">Contact</Link>
-            <Link href="/shipping" className="transition hover:text-plum">Shipping</Link>
+            <Link href="/about" className="transition hover:text-plum">
+              About
+            </Link>
+            <Link href="/contact" className="transition hover:text-plum">
+              Contact
+            </Link>
+            <Link href="/shipping" className="transition hover:text-plum">
+              Shipping
+            </Link>
           </div>
         </div>
       </footer>
