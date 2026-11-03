@@ -12,6 +12,7 @@ export default function CartDrawer() {
     removeItem,
     updateQuantity,
     totalPrice,
+    giftNote,
   } = useCart();
 
   if (!isOpen) return null;
@@ -145,6 +146,17 @@ export default function CartDrawer() {
                   </div>
                 </div>
               ))}
+
+              {giftNote && (
+                <div className="rounded-xl border border-plum/15 bg-plum/5 p-3">
+                  <p className="text-[11px] font-medium text-charcoal">
+                    Gift note
+                  </p>
+                  <p className="mt-1 text-xs leading-relaxed text-taupe">
+                    {giftNote}
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>
