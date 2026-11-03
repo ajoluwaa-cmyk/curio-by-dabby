@@ -24,6 +24,8 @@ export default function ProductDetailPage({ params }: PageProps) {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
+  const { addItem } = useCart();
+
   if (!product) {
     notFound();
   }
@@ -37,6 +39,8 @@ export default function ProductDetailPage({ params }: PageProps) {
     .slice(0, 4);
 
   const handleAddToCart = () => {
+    if (!product.inStock) return;
+    addItem(product, quantity, selectedColor, selectedSize);
     setAdded(true);
     setTimeout(() => setAdded(false), 2200);
   };
@@ -75,7 +79,8 @@ export default function ProductDetailPage({ params }: PageProps) {
                 <div
                   key={i}
                   className={`aspect-square rounded-xl bg-gradient-to-br ${
-                    product.imageGradient || "from-champagne/20 via-ivory to-plum/5"
+                    product.imageGradient ||
+                    "from-champagne/20 via-ivory to-plum/5"
                   } ${i === 0 ? "ring-2 ring-plum/40" : "opacity-60"}`}
                 />
               ))}
@@ -113,7 +118,9 @@ export default function ProductDetailPage({ params }: PageProps) {
                 <p className="mb-2.5 text-xs font-medium text-charcoal">
                   Colour
                   {selectedColor ? (
-                    <span className="ml-2 font-normal text-taupe">{selectedColor}</span>
+                    <span className="ml-2 font-normal text-taupe">
+                      {selectedColor}
+                    </span>
                   ) : null}
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -165,7 +172,9 @@ export default function ProductDetailPage({ params }: PageProps) {
                 >
                   −
                 </button>
-                <span className="min-w-[2.5rem] text-center text-sm">{quantity}</span>
+                <span className="min-w-[2.5rem] text-center text-sm">
+                  {quantity}
+                </span>
                 <button
                   onClick={() => setQuantity((q) => q + 1)}
                   className="px-4 py-2 text-sm text-charcoal transition hover:text-plum"
@@ -202,7 +211,9 @@ export default function ProductDetailPage({ params }: PageProps) {
               {product.isOriginal && (
                 <p>Curio Original — designed with intention</p>
               )}
-              {product.isLimited && <p>Limited edition — small batch release</p>}
+              {product.isLimited && (
+                <p>Limited edition — small batch release</p>
+              )}
               <p>Ships within 2–4 business days</p>
             </div>
           </div>
