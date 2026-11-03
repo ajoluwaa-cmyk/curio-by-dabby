@@ -1,14 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
-import { CreateOrderPayload, Order } from "@/types/order";
+import { createClient } from "@supabase/supabase-js";
 
 function generateOrderId(): string {
   const num = Math.floor(100000 + Math.random() * 900000);
   return `CURIO-${num}`;
 }
 
+function getServiceClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) throw new Error("Supabase env missing");
+  return createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as CreateOrderPayload;
+    const body = await request.json();
 
     if (
       !body?.customer?.fullName ||
@@ -32,33 +43,85 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
     }
 
-    const order: Order = {
-      id: generateOrderId(),
+    const orderId = generateOrderId();
+    const supabase = getServiceClient();
+
+    const { error: orderError } = await supabase.from("orders").insert({
+      id: orderId,
+      status: "pending",
+      payment_status: "unpaid",
+      customer_full_name: body.customer.fullName,
+      customer_email: body.customer.email,
+      customer_phone: body.customer.phone,
+      shipping_address: body.shipping.address,
+      shipping_city: body.shipping.city,
+      shipping_state: body.shipping.state,
+      shipping_country: body.shipping.country || "Nigeria",
+      shipping_note: body.shipping.note || null,
+      gift_note: body.giftNote || null,
+      subtotal: body.subtotal || 0,
+    });
+
+    if (orderError) {
+      console.error(orderError);
+      return NextResponse.json(
+        { error: orderError.message || "Could not create order" },
+        { status: 500 }
+      );
+    }
+
+    const items = body.items.map(
+      (i: {
+        productId?: string;
+        name: string;
+        price: number;
+        quantity: number;
+        selectedColor?: string;
+        selectedSize?: string;
+      }) => ({
+        order_id: orderId,
+        product_id: i.productId || null,
+        name: i.name,
+        price: i.price,
+        quantity: i.quantity,
+        selected_color: i.selectedColor || null,
+        selected_size: i.selectedSize || null,
+      })
+    );
+
+    const { error: itemsError } = await supabase
+      .from("order_items")
+      .insert(items);
+
+    if (itemsError) {
+      console.error(itemsError);
+    }
+
+    // Upsert customer
+    await supabase.from("customers").upsert(
+      {
+        email: body.customer.email,
+        full_name: body.customer.fullName,
+        phone: body.customer.phone,
+      },
+      { onConflict: "email" }
+    );
+
+    const order = {
+      id: orderId,
       createdAt: new Date().toISOString(),
       status: "pending",
       customer: body.customer,
-      shipping: {
-        ...body.shipping,
-        country: body.shipping.country || "Nigeria",
-      },
+      shipping: body.shipping,
       items: body.items,
       subtotal: body.subtotal,
-      giftNote: body.giftNote || undefined,
+      giftNote: body.giftNote,
       paymentStatus: "unpaid",
     };
 
-    // Phase 1: order is accepted and returned.
-    // When Admin + database are ready, persist `order` here (e.g. Supabase/Postgres).
-    // For now the client also keeps a copy on the success page via query/session.
-
-    console.log("[Curio Order]", JSON.stringify(order, null, 2));
-
-    return NextResponse.json({
-      success: true,
-      orderId: order.id,
-      order,
-    });
-  } catch {
+    return NextResponse.json({ success: true, orderId, order });
+  } catch (e) {
+    console.error(e);
     return NextResponse.json(
       { error: "Could not create order" },
       { status: 500 }
