@@ -17,7 +17,9 @@
     "clsx": "^2.1.1",
     "tailwind-merge": "^2.6.0",
     "class-variance-authority": "^0.7.1",
-    "zustand": "^5.0.2"
+    "zustand": "^5.0.2",
+    "@supabase/supabase-js": "^2.47.10",
+    "@supabase/ssr": "^0.5.2"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
@@ -31,5 +33,3 @@
     "eslint-config-next": "^15.1.0"
   }
 }
-"@supabase/supabase-js": "^2.47.10",
-"@supabase/ssr": "^0.5.2"
