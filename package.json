@@ -31,3 +31,5 @@
     "eslint-config-next": "^15.1.0"
   }
 }
+"@supabase/supabase-js": "^2.47.10",
+"@supabase/ssr": "^0.5.2"
