@@ -2,18 +2,27 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AskCurioPanel from "./AskCurioPanel";
+import CartDrawer from "./CartDrawer";
+import { useCart } from "@/store/cart";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isCurioOpen, setIsCurioOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  const { openCart, totalItems } = useCart();
+  const count = totalItems();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 bg-ivory/85 backdrop-blur-md border-b border-taupe/15">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 lg:px-8">
-          {/* Logo */}
           <Link href="/" className="flex items-center">
             <Image
               src="/curio-logo.png"
@@ -25,7 +34,6 @@ export default function Header() {
             />
           </Link>
 
-          {/* Desktop Navigation */}
           <nav className="hidden items-center gap-8 md:flex">
             <Link href="/shop" className="text-sm text-charcoal/80 transition hover:text-plum">
               Shop
@@ -44,7 +52,6 @@ export default function Header() {
             </Link>
           </nav>
 
-          {/* Right side */}
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsCurioOpen(true)}
@@ -53,7 +60,26 @@ export default function Header() {
               Ask Curio
             </button>
 
-            {/* Mobile menu button */}
+            <button
+              onClick={openCart}
+              className="relative rounded-full p-2 text-charcoal transition hover:bg-taupe/10"
+              aria-label="Open cart"
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                />
+              </svg>
+              {mounted && count > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-plum text-[10px] font-medium text-ivory">
+                  {count > 9 ? "9+" : count}
+                </span>
+              )}
+            </button>
+
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="md:hidden p-1 text-charcoal"
@@ -70,7 +96,6 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile menu */}
         {isOpen && (
           <div className="border-t border-taupe/15 bg-ivory md:hidden">
             <div className="flex flex-col space-y-4 px-6 py-6">
@@ -93,8 +118,8 @@ export default function Header() {
         )}
       </header>
 
-      {/* AI Panel */}
       <AskCurioPanel isOpen={isCurioOpen} onClose={() => setIsCurioOpen(false)} />
+      <CartDrawer />
     </>
   );
 }
