@@ -14,6 +14,7 @@ export interface CartItem {
 interface CartState {
   items: CartItem[];
   isOpen: boolean;
+  giftNote: string;
   addItem: (
     product: Product,
     quantity?: number,
@@ -32,6 +33,7 @@ interface CartState {
     selectedSize?: string
   ) => void;
   clearCart: () => void;
+  setGiftNote: (note: string) => void;
   openCart: () => void;
   closeCart: () => void;
   toggleCart: () => void;
@@ -48,6 +50,7 @@ export const useCart = create<CartState>()(
     (set, get) => ({
       items: [],
       isOpen: false,
+      giftNote: "",
 
       addItem: (product, quantity = 1, selectedColor, selectedSize) => {
         set((state) => {
@@ -103,7 +106,9 @@ export const useCart = create<CartState>()(
         }));
       },
 
-      clearCart: () => set({ items: [] }),
+      clearCart: () => set({ items: [], giftNote: "" }),
+
+      setGiftNote: (note) => set({ giftNote: note }),
 
       openCart: () => set({ isOpen: true }),
       closeCart: () => set({ isOpen: false }),
@@ -120,7 +125,10 @@ export const useCart = create<CartState>()(
     }),
     {
       name: "curio-cart",
-      partialize: (state) => ({ items: state.items }),
+      partialize: (state) => ({
+        items: state.items,
+        giftNote: state.giftNote,
+      }),
     }
   )
 );
