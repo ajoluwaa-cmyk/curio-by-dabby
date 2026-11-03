@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProductById, formatPrice, products } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
+import { useCart } from "@/store/cart";
 
 interface PageProps {
   params: Promise<{ id: string }>;
