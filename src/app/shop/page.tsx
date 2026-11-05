@@ -1,21 +1,8 @@
-"use client";
+import { getAllProducts } from "@/lib/products";
+import ShopClient from "@/components/ShopClient";
 
-import { useState, useMemo } from "react";
-import { products } from "@/data/products";
-import ProductCard from "@/components/ProductCard";
-
-const FILTERS = ["All", "Beauty", "Fashion", "Accessories", "Hair", "Originals"] as const;
-
-export default function ShopPage() {
-  const [activeFilter, setActiveFilter] = useState<(typeof FILTERS)[number]>("All");
-
-  const filtered = useMemo(() => {
-    if (activeFilter === "All") return products;
-    if (activeFilter === "Originals") return products.filter((p) => p.isOriginal);
-    return products.filter(
-      (p) => p.category.toLowerCase() === activeFilter.toLowerCase()
-    );
-  }, [activeFilter]);
+export default async function ShopPage() {
+  const products = await getAllProducts();
 
   return (
     <main className="pt-16">
@@ -28,46 +15,13 @@ export default function ShopPage() {
             Shop
           </h1>
           <p className="mx-auto max-w-md text-sm text-taupe">
-            Distinctive lifestyle pieces, original collections, and thoughtful finds.
+            Distinctive lifestyle pieces, original collections, and thoughtful
+            finds.
           </p>
         </div>
       </section>
 
-      <section className="px-6 py-12 md:py-16">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-10 flex flex-wrap items-center gap-3">
-            {FILTERS.map((filter) => (
-              <button
-                key={filter}
-                onClick={() => setActiveFilter(filter)}
-                className={`rounded-full px-5 py-2 text-sm transition ${
-                  activeFilter === filter
-                    ? "bg-plum text-ivory"
-                    : "border border-taupe/25 text-charcoal hover:border-plum/40"
-                }`}
-              >
-                {filter}
-              </button>
-            ))}
-          </div>
-
-          <p className="mb-6 text-xs text-taupe">
-            {filtered.length} {filtered.length === 1 ? "piece" : "pieces"}
-          </p>
-
-          {filtered.length > 0 ? (
-            <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4 md:gap-7">
-              {filtered.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          ) : (
-            <div className="py-20 text-center">
-              <p className="text-sm text-taupe">No pieces in this category yet.</p>
-            </div>
-          )}
-        </div>
-      </section>
+      <ShopClient products={products} />
     </main>
   );
 }
