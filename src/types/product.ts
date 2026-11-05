@@ -19,7 +19,7 @@ export interface Product {
   slug: string;
   category: ProductCategory;
   subcategory?: string;
-  price: number; // in Naira
+  price: number;
   compareAtPrice?: number;
   description: string;
   shortDescription: string;
@@ -33,6 +33,8 @@ export interface Product {
   occasionTags?: string[];
   styleTags?: string[];
   imageGradient?: string;
+  /** Public image URLs (Supabase Storage or external) */
+  imageUrls?: string[];
 }
 
 export interface CartItem {
