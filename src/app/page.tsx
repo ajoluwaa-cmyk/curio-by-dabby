@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 
 const fadeUp = {
@@ -8,12 +9,20 @@ const fadeUp = {
   visible: { opacity: 1, y: 0 },
 };
 
+const categories = [
+  { name: "Beauty", href: "/shop", image: "/beauty.jpg" },
+  { name: "Fashion", href: "/shop", image: "/Fashion.jpg" },
+  { name: "Adire", href: "/shop", image: "/Adire.jpg" },
+  { name: "Accessories", href: "/shop", image: "/Accessories.jpg" },
+  { name: "Gifting", href: "/gifts", image: "/Gifting.jpg" },
+  { name: "Originals", href: "/shop", image: "/originals.jpg" },
+];
+
 export default function HomePage() {
   return (
     <main className="pt-16">
       {/* ================= HERO ================= */}
       <section className="relative flex min-h-[90vh] items-center justify-center overflow-hidden px-6">
-        {/* Video Background */}
         <video
           autoPlay
           muted
@@ -27,13 +36,9 @@ export default function HomePage() {
           />
         </video>
 
-        {/* Dark overlay for text readability */}
         <div className="absolute inset-0 bg-charcoal/50" />
-
-        {/* Soft brand gradient on top */}
         <div className="absolute inset-0 bg-gradient-to-b from-plum/25 via-transparent to-charcoal/40" />
 
-        {/* Content */}
         <div className="relative z-10 mx-auto max-w-3xl text-center">
           <motion.p
             initial="hidden"
@@ -102,21 +107,23 @@ export default function HomePage() {
               Carefully curated for every intention
             </p>
           </div>
+
           <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-6">
-            {[
-              { name: "Beauty", href: "/shop/beauty" },
-              { name: "Fashion", href: "/shop/fashion" },
-              { name: "Adire", href: "/collections/adire" },
-              { name: "Accessories", href: "/shop/accessories" },
-              { name: "Gifting", href: "/gifts" },
-              { name: "Originals", href: "/collections" },
-            ].map((item) => (
+            {categories.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="group flex aspect-[3/4] flex-col items-center justify-center rounded-2xl border border-taupe/15 bg-white/60 transition duration-300 hover:border-plum/25 hover:bg-white hover:shadow-soft"
+                className="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-taupe/10 transition duration-500 hover:shadow-elegant"
               >
-                <span className="text-sm font-medium text-charcoal transition group-hover:text-plum">
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  fill
+                  className="object-cover transition duration-500 group-hover:scale-[1.04]"
+                  sizes="(max-width: 768px) 50vw, 16vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 via-charcoal/15 to-transparent" />
+                <span className="absolute bottom-4 left-0 right-0 text-center text-sm font-medium text-ivory">
                   {item.name}
                 </span>
               </Link>
@@ -140,9 +147,12 @@ export default function HomePage() {
             budget. Receive thoughtful recommendations from real products in our
             collection.
           </p>
-          <button className="rounded-full bg-champagne px-8 py-3.5 text-sm font-medium text-plum transition hover:bg-white">
+          <Link
+            href="/shop"
+            className="inline-block rounded-full bg-champagne px-8 py-3.5 text-sm font-medium text-plum transition hover:bg-white"
+          >
             Ask Curio
-          </button>
+          </Link>
         </div>
       </section>
 
