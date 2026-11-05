@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { ProductRow } from "@/types/database";
 
@@ -35,8 +36,8 @@ export default function ProductForm({ product }: Props) {
   const [tag, setTag] = useState(product?.tag || "");
   const [colors, setColors] = useState((product?.colors || []).join(", "));
   const [sizes, setSizes] = useState((product?.sizes || []).join(", "));
-  const [imageUrls, setImageUrls] = useState(
-    (product?.image_urls || []).join("\n")
+  const [imageUrls, setImageUrls] = useState<string[]>(
+    product?.image_urls || []
   );
   const [imageGradient, setImageGradient] = useState(
     product?.image_gradient || ""
@@ -49,11 +50,61 @@ export default function ProductForm({ product }: Props) {
   const [stockQty, setStockQty] = useState(
     product?.stock_quantity?.toString() || "0"
   );
+  const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   const handleNameBlur = () => {
     if (!slug && name) setSlug(slugify(name));
+  };
+
+  const uploadFiles = async (files: FileList | null) => {
+    if (!files?.length) return;
+    setUploading(true);
+    setError("");
+    const supabase = createClient();
+    const newUrls: string[] = [];
+
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith("image/")) continue;
+      if (file.size > 5 * 1024 * 1024) {
+        setError("Each image must be under 5MB");
+        continue;
+      }
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+      const { error: upErr } = await supabase.storage
+        .from("product-images")
+        .upload(path, file, { cacheControl: "3600", upsert: false });
+
+      if (upErr) {
+        setError(upErr.message);
+        continue;
+      }
+
+      const { data } = supabase.storage
+        .from("product-images")
+        .getPublicUrl(path);
+      newUrls.push(data.publicUrl);
+    }
+
+    setImageUrls((prev) => [...prev, ...newUrls]);
+    setUploading(false);
+  };
+
+  const removeImage = (url: string) => {
+    setImageUrls((prev) => prev.filter((u) => u !== url));
+  };
+
+  const moveImage = (index: number, dir: -1 | 1) => {
+    setImageUrls((prev) => {
+      const next = [...prev];
+      const j = index + dir;
+      if (j < 0 || j >= next.length) return prev;
+      [next[index], next[j]] = [next[j], next[index]];
+      return next;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -79,10 +130,7 @@ export default function ProductForm({ product }: Props) {
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean),
-      image_urls: imageUrls
-        .split("\n")
-        .map((s) => s.trim())
-        .filter(Boolean),
+      image_urls: imageUrls,
       image_gradient: imageGradient || null,
       collection: collection || null,
       in_stock: inStock,
@@ -127,7 +175,7 @@ export default function ProductForm({ product }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="mx-auto max-w-2xl space-y-6">
-      <div className="rounded-2xl border border-taupe/15 bg-white p-6 space-y-4">
+      <div className="space-y-4 rounded-2xl border border-taupe/15 bg-white p-6">
         <h2 className="text-sm font-medium text-charcoal">Basic info</h2>
         <Field label="Name *">
           <input
@@ -135,7 +183,7 @@ export default function ProductForm({ product }: Props) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             onBlur={handleNameBlur}
-            className="input"
+            className="field"
           />
         </Field>
         <Field label="Slug *">
@@ -143,7 +191,7 @@ export default function ProductForm({ product }: Props) {
             required
             value={slug}
             onChange={(e) => setSlug(e.target.value)}
-            className="input"
+            className="field"
           />
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -151,7 +199,7 @@ export default function ProductForm({ product }: Props) {
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="input"
+              className="field"
             >
               {["Beauty", "Fashion", "Accessories", "Hair", "Originals"].map(
                 (c) => (
@@ -166,7 +214,7 @@ export default function ProductForm({ product }: Props) {
             <input
               value={subcategory}
               onChange={(e) => setSubcategory(e.target.value)}
-              className="input"
+              className="field"
             />
           </Field>
         </div>
@@ -178,16 +226,16 @@ export default function ProductForm({ product }: Props) {
               min={0}
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="input"
+              className="field"
             />
           </Field>
-          <Field label="Compare at price">
+          <Field label="Compare at">
             <input
               type="number"
               min={0}
               value={compareAt}
               onChange={(e) => setCompareAt(e.target.value)}
-              className="input"
+              className="field"
             />
           </Field>
         </div>
@@ -195,7 +243,7 @@ export default function ProductForm({ product }: Props) {
           <input
             value={shortDescription}
             onChange={(e) => setShortDescription(e.target.value)}
-            className="input"
+            className="field"
           />
         </Field>
         <Field label="Description">
@@ -203,57 +251,135 @@ export default function ProductForm({ product }: Props) {
             rows={4}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="input"
+            className="field"
           />
         </Field>
       </div>
 
-      <div className="rounded-2xl border border-taupe/15 bg-white p-6 space-y-4">
-        <h2 className="text-sm font-medium text-charcoal">Variants & media</h2>
-        <Field label="Tag (e.g. Curio Original, Limited, New)">
-          <input value={tag} onChange={(e) => setTag(e.target.value)} className="input" />
+      {/* IMAGES */}
+      <div className="space-y-4 rounded-2xl border border-taupe/15 bg-white p-6">
+        <h2 className="text-sm font-medium text-charcoal">
+          Product images (multiple)
+        </h2>
+        <p className="text-xs text-taupe">
+          First image is the main photo. You can upload several (JPG, PNG, WebP,
+          max 5MB each).
+        </p>
+
+        <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-taupe/40 bg-ivory/50 px-4 py-8 transition hover:border-plum/40">
+          <span className="text-sm font-medium text-plum">
+            {uploading ? "Uploading…" : "Click to upload images"}
+          </span>
+          <span className="mt-1 text-xs text-taupe">or drag files here</span>
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            multiple
+            className="hidden"
+            disabled={uploading}
+            onChange={(e) => uploadFiles(e.target.files)}
+          />
+        </label>
+
+        {imageUrls.length > 0 && (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {imageUrls.map((url, i) => (
+              <div
+                key={url}
+                className="relative aspect-square overflow-hidden rounded-xl border border-taupe/15 bg-taupe/5"
+              >
+                <Image
+                  src={url}
+                  alt={`Product ${i + 1}`}
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+                {i === 0 && (
+                  <span className="absolute left-2 top-2 rounded-full bg-plum px-2 py-0.5 text-[10px] text-ivory">
+                    Main
+                  </span>
+                )}
+                <div className="absolute bottom-2 right-2 flex gap-1">
+                  <button
+                    type="button"
+                    onClick={() => moveImage(i, -1)}
+                    className="rounded bg-white/90 px-1.5 text-xs"
+                  >
+                    ←
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveImage(i, 1)}
+                    className="rounded bg-white/90 px-1.5 text-xs"
+                  >
+                    →
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeImage(url)}
+                    className="rounded bg-white/90 px-1.5 text-xs text-red-600"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <Field label="Or paste image URLs (optional, one per line)">
+          <textarea
+            rows={2}
+            className="field"
+            placeholder="https://..."
+            onBlur={(e) => {
+              const extra = e.target.value
+                .split("\n")
+                .map((s) => s.trim())
+                .filter(Boolean);
+              if (extra.length) {
+                setImageUrls((prev) => [...prev, ...extra]);
+                e.target.value = "";
+              }
+            }}
+          />
+        </Field>
+      </div>
+
+      <div className="space-y-4 rounded-2xl border border-taupe/15 bg-white p-6">
+        <h2 className="text-sm font-medium text-charcoal">Variants & flags</h2>
+        <Field label="Tag">
+          <input value={tag} onChange={(e) => setTag(e.target.value)} className="field" />
         </Field>
         <Field label="Colours (comma-separated)">
-          <input value={colors} onChange={(e) => setColors(e.target.value)} className="input" />
+          <input value={colors} onChange={(e) => setColors(e.target.value)} className="field" />
         </Field>
         <Field label="Sizes (comma-separated)">
-          <input value={sizes} onChange={(e) => setSizes(e.target.value)} className="input" />
+          <input value={sizes} onChange={(e) => setSizes(e.target.value)} className="field" />
         </Field>
-        <Field label="Collection (signature / artwear / colour-stories / adire)">
+        <Field label="Collection">
           <input
             value={collection}
             onChange={(e) => setCollection(e.target.value)}
-            className="input"
+            className="field"
+            placeholder="signature / artwear / adire"
           />
         </Field>
-        <Field label="Image URLs (one per line — Supabase Storage or external)">
-          <textarea
-            rows={3}
-            value={imageUrls}
-            onChange={(e) => setImageUrls(e.target.value)}
-            className="input"
-            placeholder="https://..."
-          />
-        </Field>
-        <Field label="Fallback gradient class (optional)">
+        <Field label="Fallback gradient (if no image)">
           <input
             value={imageGradient}
             onChange={(e) => setImageGradient(e.target.value)}
-            className="input"
-            placeholder="from-champagne/30 via-ivory to-plum/10"
+            className="field"
           />
         </Field>
-      </div>
-
-      <div className="rounded-2xl border border-taupe/15 bg-white p-6 space-y-4">
-        <h2 className="text-sm font-medium text-charcoal">Inventory & flags</h2>
         <Field label="Stock quantity">
           <input
             type="number"
             min={0}
             value={stockQty}
             onChange={(e) => setStockQty(e.target.value)}
-            className="input"
+            className="field"
           />
         </Field>
         <div className="flex flex-wrap gap-4 text-sm">
@@ -263,7 +389,7 @@ export default function ProductForm({ product }: Props) {
           </label>
           <label className="flex items-center gap-2">
             <input type="checkbox" checked={isVisible} onChange={(e) => setIsVisible(e.target.checked)} />
-            Visible on store
+            Visible
           </label>
           <label className="flex items-center gap-2">
             <input type="checkbox" checked={isOriginal} onChange={(e) => setIsOriginal(e.target.checked)} />
@@ -271,7 +397,7 @@ export default function ProductForm({ product }: Props) {
           </label>
           <label className="flex items-center gap-2">
             <input type="checkbox" checked={isLimited} onChange={(e) => setIsLimited(e.target.checked)} />
-            Limited edition
+            Limited
           </label>
         </div>
       </div>
@@ -281,7 +407,7 @@ export default function ProductForm({ product }: Props) {
       <div className="flex flex-wrap gap-3">
         <button
           type="submit"
-          disabled={saving}
+          disabled={saving || uploading}
           className="rounded-full bg-plum px-8 py-3 text-sm font-medium text-ivory hover:bg-plum/90 disabled:opacity-60"
         >
           {saving ? "Saving…" : isEdit ? "Update product" : "Create product"}
@@ -290,7 +416,7 @@ export default function ProductForm({ product }: Props) {
           <button
             type="button"
             onClick={handleDelete}
-            className="rounded-full border border-red-200 px-6 py-3 text-sm text-red-600 hover:bg-red-50"
+            className="rounded-full border border-red-200 px-6 py-3 text-sm text-red-600"
           >
             Delete
           </button>
@@ -298,7 +424,7 @@ export default function ProductForm({ product }: Props) {
       </div>
 
       <style jsx>{`
-        :global(.input) {
+        :global(.field) {
           width: 100%;
           border-radius: 0.75rem;
           border: 1px solid rgba(168, 148, 131, 0.25);
@@ -307,7 +433,7 @@ export default function ProductForm({ product }: Props) {
           font-size: 0.875rem;
           outline: none;
         }
-        :global(.input:focus) {
+        :global(.field:focus) {
           border-color: #54263f;
         }
       `}</style>
