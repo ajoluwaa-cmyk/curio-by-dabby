@@ -15,13 +15,9 @@ export default function ProductDetailClient({
   product: Product;
   related: Product[];
 }) {
-  const images = product.imageUrls?.length
-    ? product.imageUrls
-    : ([] as string[]);
+  const images = product.imageUrls?.length ? product.imageUrls : [];
   const [activeImage, setActiveImage] = useState(0);
-  const [selectedColor, setSelectedColor] = useState(
-    product.colors?.[0]
-  );
+  const [selectedColor, setSelectedColor] = useState(product.colors?.[0]);
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0]);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
@@ -50,7 +46,6 @@ export default function ProductDetailClient({
 
       <section className="px-6 py-10 md:py-16">
         <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-2 md:gap-14">
-          {/* Gallery */}
           <div className="space-y-4">
             <div
               className={`relative aspect-[3/4] overflow-hidden rounded-2xl ${
@@ -102,7 +97,6 @@ export default function ProductDetailClient({
             )}
           </div>
 
-          {/* Details */}
           <div className="flex flex-col">
             <p className="mb-2 text-[11px] font-medium tracking-[0.2em] text-taupe uppercase">
               {product.category}
@@ -130,9 +124,7 @@ export default function ProductDetailClient({
                 <p className="mb-2.5 text-xs font-medium text-charcoal">
                   Colour{" "}
                   {selectedColor && (
-                    <span className="font-normal text-taupe">
-                      {selectedColor}
-                    </span>
+                    <span className="font-normal text-taupe">{selectedColor}</span>
                   )}
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -183,9 +175,7 @@ export default function ProductDetailClient({
                 >
                   −
                 </button>
-                <span className="min-w-[2.5rem] text-center text-sm">
-                  {quantity}
-                </span>
+                <span className="min-w-[2.5rem] text-center text-sm">{quantity}</span>
                 <button
                   onClick={() => setQuantity((q) => q + 1)}
                   className="px-4 py-2 text-sm"
