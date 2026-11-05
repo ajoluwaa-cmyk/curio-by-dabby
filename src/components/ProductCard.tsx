@@ -1,19 +1,36 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Product } from "@/types/product";
-import { formatPrice } from "@/data/products";
+import { formatPrice } from "@/lib/products";
 
 interface ProductCardProps {
   product: Product;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const mainImage = product.imageUrls?.[0];
+
   return (
     <Link href={`/shop/${product.id}`} className="group">
       <div
-        className={`relative mb-4 aspect-[3/4] overflow-hidden rounded-2xl bg-gradient-to-br ${
-          product.imageGradient || "from-champagne/30 via-ivory to-plum/10"
+        className={`relative mb-4 aspect-[3/4] overflow-hidden rounded-2xl ${
+          mainImage
+            ? "bg-taupe/10"
+            : `bg-gradient-to-br ${
+                product.imageGradient ||
+                "from-champagne/30 via-ivory to-plum/10"
+              }`
         } transition duration-500 group-hover:shadow-elegant`}
       >
+        {mainImage && (
+          <Image
+            src={mainImage}
+            alt={product.name}
+            fill
+            className="object-cover transition duration-500 group-hover:scale-[1.03]"
+            sizes="(max-width: 768px) 50vw, 25vw"
+          />
+        )}
         {product.tag && (
           <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-medium tracking-wide text-plum">
             {product.tag}
