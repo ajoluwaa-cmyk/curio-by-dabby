@@ -3,22 +3,41 @@
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { formatPrice } from "@/data/products";
-import { Order } from "@/types/order";
+import { formatPrice } from "@/lib/format";
+
+type LastOrder = {
+  id: string;
+  items?: { name: string; quantity: number; price: number }[];
+  subtotal?: number;
+  giftNote?: string;
+  customer?: { email?: string; phone?: string };
+};
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("order") || "—";
-  const [order, setOrder] = useState<Order | null>(null);
+  const [order, setOrder] = useState<LastOrder | null>(null);
+  const [shippingNote, setShippingNote] = useState(
+    "Ships within 2–4 business days after order confirmation."
+  );
+  const [deliveryEstimate, setDeliveryEstimate] = useState(
+    "Lagos & major cities: typically 3–6 business days total. Other locations: 5–10 business days."
+  );
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
     try {
       const raw = sessionStorage.getItem("curio-last-order");
       if (raw) setOrder(JSON.parse(raw));
     } catch {
       // ignore
     }
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.shippingNote) setShippingNote(d.shippingNote);
+        if (d.deliveryEstimate) setDeliveryEstimate(d.deliveryEstimate);
+      })
+      .catch(() => {});
   }, []);
 
   return (
@@ -32,14 +51,26 @@ function SuccessContent() {
             Order received
           </h1>
           <p className="mb-2 text-sm text-taupe">
-            Thank you. We’ve received your order and will confirm by email.
+            Thank you. We’ve received your order and will confirm shortly.
           </p>
-          <p className="mb-10 text-sm font-medium text-plum">
+          <p className="mb-8 text-sm font-medium text-plum">
             Order ID: {orderId}
           </p>
 
-          {order && (
-            <div className="mb-10 rounded-2xl border border-taupe/15 bg-white p-6 text-left">
+          <div className="mb-8 rounded-2xl border border-plum/15 bg-plum/5 p-5 text-left">
+            <p className="mb-1 text-xs font-medium uppercase tracking-wide text-charcoal">
+              What happens next
+            </p>
+            <ol className="list-decimal space-y-1.5 pl-4 text-sm text-taupe">
+              <li>We confirm your order (email or WhatsApp).</li>
+              <li>{shippingNote}</li>
+              <li>{deliveryEstimate}</li>
+              <li>You’ll get updates when your order is processing and shipped.</li>
+            </ol>
+          </div>
+
+          {order?.items && (
+            <div className="mb-8 rounded-2xl border border-taupe/15 bg-white p-6 text-left">
               <p className="mb-3 text-xs font-medium uppercase tracking-wide text-taupe">
                 Summary
               </p>
@@ -55,18 +86,20 @@ function SuccessContent() {
                   </li>
                 ))}
               </ul>
-              <div className="flex justify-between border-t border-taupe/15 pt-3 text-sm font-medium text-charcoal">
-                <span>Subtotal</span>
-                <span>{formatPrice(order.subtotal)}</span>
-              </div>
+              {order.subtotal != null && (
+                <div className="flex justify-between border-t border-taupe/15 pt-3 text-sm font-medium">
+                  <span>Subtotal</span>
+                  <span>{formatPrice(order.subtotal)}</span>
+                </div>
+              )}
               {order.giftNote && (
-                <p className="mt-4 text-xs leading-relaxed text-taupe">
+                <p className="mt-3 text-xs text-taupe">
                   <span className="font-medium text-charcoal">Gift note: </span>
                   {order.giftNote}
                 </p>
               )}
               <p className="mt-3 text-xs text-taupe">
-                Payment status: unpaid (payment integration coming next)
+                Payment: unpaid until Paystack is enabled at launch.
               </p>
             </div>
           )}
@@ -79,10 +112,10 @@ function SuccessContent() {
               Continue shopping
             </Link>
             <Link
-              href="/"
+              href="/shipping"
               className="rounded-full border border-taupe/25 px-8 py-3.5 text-sm font-medium text-charcoal transition hover:border-plum/40"
             >
-              Back home
+              Shipping info
             </Link>
           </div>
         </div>
