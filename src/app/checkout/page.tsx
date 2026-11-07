@@ -4,7 +4,22 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/store/cart";
-import { formatPrice } from "@/data/products";
+import { formatPrice } from "@/lib/format";
+
+type PublicSettings = {
+  shippingFee: number;
+  freeShippingMin: number;
+  shippingNote: string;
+  deliveryEstimate: string;
+};
+
+const defaultSettings: PublicSettings = {
+  shippingFee: 2500,
+  freeShippingMin: 50000,
+  shippingNote: "Ships within 2–4 business days after order confirmation.",
+  deliveryEstimate:
+    "Lagos & major cities: typically 3–6 business days total. Other locations: 5–10 business days.",
+};
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -12,6 +27,7 @@ export default function CheckoutPage() {
   const [mounted, setMounted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [settings, setSettings] = useState<PublicSettings>(defaultSettings);
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -23,6 +39,12 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     setMounted(true);
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d?.shippingFee != null) setSettings(d);
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -30,6 +52,13 @@ export default function CheckoutPage() {
       router.replace("/shop");
     }
   }, [mounted, items.length, router]);
+
+  const subtotal = totalPrice();
+  const shippingCost =
+    settings.freeShippingMin > 0 && subtotal >= settings.freeShippingMin
+      ? 0
+      : settings.shippingFee;
+  const grandTotal = subtotal + shippingCost;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +83,8 @@ export default function CheckoutPage() {
           selectedColor: i.selectedColor,
           selectedSize: i.selectedSize,
         })),
-        subtotal: totalPrice(),
+        subtotal,
+        shippingCost,
         giftNote: giftNote || undefined,
       };
 
@@ -72,12 +102,8 @@ export default function CheckoutPage() {
         return;
       }
 
-      // Keep a local copy for success page / future admin
       if (typeof window !== "undefined") {
-        sessionStorage.setItem(
-          "curio-last-order",
-          JSON.stringify(data.order)
-        );
+        sessionStorage.setItem("curio-last-order", JSON.stringify(data.order));
       }
 
       clearCart();
@@ -96,9 +122,7 @@ export default function CheckoutPage() {
     );
   }
 
-  if (items.length === 0) {
-    return null;
-  }
+  if (items.length === 0) return null;
 
   return (
     <main className="pt-16">
@@ -111,8 +135,8 @@ export default function CheckoutPage() {
             Checkout
           </h1>
           <p className="mt-2 text-sm text-taupe">
-            Payment will be enabled soon. Place your order and we’ll confirm by
-            email.
+            Payment will be enabled at launch. Place your order and we’ll
+            confirm by email or WhatsApp.
           </p>
         </div>
       </section>
@@ -122,9 +146,7 @@ export default function CheckoutPage() {
           onSubmit={handleSubmit}
           className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1fr_360px]"
         >
-          {/* Form */}
           <div className="space-y-8">
-            {/* Contact */}
             <div className="rounded-2xl border border-taupe/15 bg-white/60 p-6">
               <h2 className="mb-5 text-base font-medium text-charcoal">
                 Contact
@@ -138,8 +160,7 @@ export default function CheckoutPage() {
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full rounded-xl border border-taupe/25 bg-white px-4 py-3 text-sm outline-none transition focus:border-plum"
-                    placeholder="Your full name"
+                    className="w-full rounded-xl border border-taupe/25 bg-white px-4 py-3 text-sm outline-none focus:border-plum"
                   />
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -152,8 +173,7 @@ export default function CheckoutPage() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full rounded-xl border border-taupe/25 bg-white px-4 py-3 text-sm outline-none transition focus:border-plum"
-                      placeholder="you@email.com"
+                      className="w-full rounded-xl border border-taupe/25 bg-white px-4 py-3 text-sm outline-none focus:border-plum"
                     />
                   </div>
                   <div>
@@ -165,18 +185,16 @@ export default function CheckoutPage() {
                       type="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full rounded-xl border border-taupe/25 bg-white px-4 py-3 text-sm outline-none transition focus:border-plum"
-                      placeholder="080…"
+                      className="w-full rounded-xl border border-taupe/25 bg-white px-4 py-3 text-sm outline-none focus:border-plum"
                     />
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Shipping */}
             <div className="rounded-2xl border border-taupe/15 bg-white/60 p-6">
               <h2 className="mb-5 text-base font-medium text-charcoal">
-                Shipping
+                Shipping address
               </h2>
               <div className="space-y-4">
                 <div>
@@ -187,8 +205,7 @@ export default function CheckoutPage() {
                     required
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
-                    className="w-full rounded-xl border border-taupe/25 bg-white px-4 py-3 text-sm outline-none transition focus:border-plum"
-                    placeholder="Street address"
+                    className="w-full rounded-xl border border-taupe/25 bg-white px-4 py-3 text-sm outline-none focus:border-plum"
                   />
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -200,8 +217,7 @@ export default function CheckoutPage() {
                       required
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      className="w-full rounded-xl border border-taupe/25 bg-white px-4 py-3 text-sm outline-none transition focus:border-plum"
-                      placeholder="City"
+                      className="w-full rounded-xl border border-taupe/25 bg-white px-4 py-3 text-sm outline-none focus:border-plum"
                     />
                   </div>
                   <div>
@@ -212,8 +228,7 @@ export default function CheckoutPage() {
                       required
                       value={state}
                       onChange={(e) => setState(e.target.value)}
-                      className="w-full rounded-xl border border-taupe/25 bg-white px-4 py-3 text-sm outline-none transition focus:border-plum"
-                      placeholder="State"
+                      className="w-full rounded-xl border border-taupe/25 bg-white px-4 py-3 text-sm outline-none focus:border-plum"
                     />
                   </div>
                 </div>
@@ -225,19 +240,36 @@ export default function CheckoutPage() {
                     value={shippingNote}
                     onChange={(e) => setShippingNote(e.target.value)}
                     rows={2}
-                    className="w-full rounded-xl border border-taupe/25 bg-white px-4 py-3 text-sm outline-none transition focus:border-plum"
+                    className="w-full rounded-xl border border-taupe/25 bg-white px-4 py-3 text-sm outline-none focus:border-plum"
                     placeholder="Landmark, preferred time…"
                   />
                 </div>
               </div>
             </div>
 
+            {/* Delivery timeline — from Admin settings */}
+            <div className="rounded-2xl border border-plum/15 bg-plum/5 p-6">
+              <h2 className="mb-2 text-base font-medium text-charcoal">
+                When will my order arrive?
+              </h2>
+              <p className="text-sm text-charcoal">{settings.shippingNote}</p>
+              <p className="mt-2 text-sm leading-relaxed text-taupe">
+                {settings.deliveryEstimate}
+              </p>
+              <Link
+                href="/shipping"
+                className="mt-3 inline-block text-xs font-medium text-plum hover:underline"
+              >
+                Full shipping policy →
+              </Link>
+            </div>
+
             {giftNote && (
-              <div className="rounded-2xl border border-plum/15 bg-plum/5 p-6">
+              <div className="rounded-2xl border border-taupe/15 bg-white p-6">
                 <h2 className="mb-2 text-base font-medium text-charcoal">
                   Gift note
                 </h2>
-                <p className="text-sm leading-relaxed text-taupe">{giftNote}</p>
+                <p className="text-sm text-taupe">{giftNote}</p>
               </div>
             )}
 
@@ -274,7 +306,7 @@ export default function CheckoutPage() {
                       {item.selectedColor ? ` · ${item.selectedColor}` : ""}
                       {item.selectedSize ? ` · ${item.selectedSize}` : ""}
                     </p>
-                    <p className="text-sm text-charcoal">
+                    <p className="text-sm">
                       {formatPrice(item.product.price * item.quantity)}
                     </p>
                   </div>
@@ -285,15 +317,23 @@ export default function CheckoutPage() {
             <div className="space-y-2 border-t border-taupe/15 pt-4 text-sm">
               <div className="flex justify-between text-taupe">
                 <span>Items ({totalItems()})</span>
-                <span>{formatPrice(totalPrice())}</span>
+                <span>{formatPrice(subtotal)}</span>
               </div>
               <div className="flex justify-between text-taupe">
                 <span>Shipping</span>
-                <span>Calculated later</span>
+                <span>
+                  {shippingCost === 0 ? "Free" : formatPrice(shippingCost)}
+                </span>
               </div>
+              {settings.freeShippingMin > 0 &&
+                subtotal < settings.freeShippingMin && (
+                  <p className="text-[11px] text-taupe">
+                    Free shipping from {formatPrice(settings.freeShippingMin)}
+                  </p>
+                )}
               <div className="flex justify-between border-t border-taupe/15 pt-3 text-base font-medium text-charcoal">
-                <span>Subtotal</span>
-                <span>{formatPrice(totalPrice())}</span>
+                <span>Total</span>
+                <span>{formatPrice(grandTotal)}</span>
               </div>
             </div>
 
@@ -304,6 +344,18 @@ export default function CheckoutPage() {
             >
               {submitting ? "Placing order…" : "Place order"}
             </button>
+
+            <p className="mt-3 text-center text-[11px] text-taupe">
+              By ordering you agree to our{" "}
+              <Link href="/shipping" className="underline">
+                Shipping
+              </Link>{" "}
+              and{" "}
+              <Link href="/returns" className="underline">
+                Returns
+              </Link>{" "}
+              policies.
+            </p>
 
             <Link
               href="/shop"
